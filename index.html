@@ -5,16 +5,31 @@
     <title>Parking Control</title>
 
     <style>
-        body {
+        /* ===== LOCK FULL SCREEN ===== */
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             font-family: Tahoma;
             background: #f2f2f2;
         }
 
+        /* ===== MAIN CONTAINER ===== */
         .container {
-            width: 420px;
-            margin: 30px auto;
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            margin: 0 auto;
             background: white;
             padding: 20px;
+            box-sizing: border-box;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
@@ -30,6 +45,7 @@
             padding: 10px;
             margin-bottom: 15px;
             text-align: center;
+            box-sizing: border-box;
         }
 
         .btn {
@@ -47,7 +63,6 @@
         .btn-other { background: #2196F3; color: white; }
 
         .count {
-            margin-top: 20px;
             font-size: 18px;
             text-align: center;
             background: #fafafa;
@@ -60,17 +75,18 @@
 <body>
 
 <div class="container">
-    <h2>🚗 ระบบลานจอดรถ</h2>
+    <div>
+        <h2>🚗 ระบบลานจอดรถ</h2>
+        <input id="plate" placeholder="กรอกเลขทะเบียน">
 
-    <input id="plate" placeholder="กรอกเลขทะเบียน">
-
-    <button class="btn btn-in" onclick="confirmAction('IN')">รถเข้า</button>
-    <button class="btn btn-out" onclick="confirmAction('OUT')">รถออก</button>
-    <button class="btn btn-other" onclick="confirmAction('FREE')">ออกฟรี</button>
-    <button class="btn btn-other" onclick="confirmAction('MONTHLY')">รายเดือน</button>
-    <button class="btn btn-other" onclick="confirmAction('LOST')">บัตรหาย</button>
-    <button class="btn btn-other" onclick="confirmAction('CANCEL')">ยกเลิก</button>
-    <button class="btn btn-other" onclick="confirmAction('TEST')">ทดสอบพิมพ์</button>
+        <button class="btn btn-in" onclick="confirmAction('IN')">รถเข้า</button>
+        <button class="btn btn-out" onclick="confirmAction('OUT')">รถออก</button>
+        <button class="btn btn-other" onclick="confirmAction('FREE')">ออกฟรี</button>
+        <button class="btn btn-other" onclick="confirmAction('MONTHLY')">รายเดือน</button>
+        <button class="btn btn-other" onclick="confirmAction('LOST')">บัตรหาย</button>
+        <button class="btn btn-other" onclick="confirmAction('CANCEL')">ยกเลิก</button>
+        <button class="btn btn-other" onclick="confirmAction('TEST')">ทดสอบพิมพ์</button>
+    </div>
 
     <div class="count">
         🚗 CAR : <b id="car">0</b> |
@@ -90,18 +106,16 @@ async function loadCount() {
         const text = await res.text();
 
         const rows = text.trim().split("\n");
-        rows.shift(); // ลบ header
+        rows.shift();
 
         let car = 0;
         let motor = 0;
 
         rows.forEach(row => {
             const col = row.split(",");
+            const vehicleType = col[2]?.trim().toUpperCase();
+            const status = col[6]?.trim().toUpperCase();
 
-            const vehicleType = col[2]?.trim().toUpperCase(); // C
-            const status = col[6]?.trim().toUpperCase();      // G
-
-            // นับเฉพาะสถานะ IN
             if (status === "IN") {
                 if (vehicleType === "CAR") car++;
                 if (vehicleType === "MOTOR") motor++;
@@ -112,7 +126,6 @@ async function loadCount() {
         document.getElementById("motor").innerText = motor;
 
     } catch (err) {
-        console.error(err);
         document.getElementById("car").innerText = 0;
         document.getElementById("motor").innerText = 0;
     }
@@ -134,7 +147,7 @@ function confirmAction(func) {
 /* ================= START ================= */
 document.addEventListener("DOMContentLoaded", () => {
     loadCount();
-    setInterval(loadCount, 15000); // refresh ทุก 15 วิ
+    setInterval(loadCount, 15000);
 });
 </script>
 
