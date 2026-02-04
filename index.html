@@ -6,7 +6,6 @@
 <title>Parking Control</title>
 
 <style>
-/* ===== RESET ===== */
 * {
     box-sizing: border-box;
 }
@@ -21,7 +20,7 @@ html, body {
     background: #eaeaea;
 }
 
-/* ===== LAYOUT ===== */
+/* ===== APP ===== */
 .app {
     min-height: 100dvh;
     max-width: 420px;
@@ -30,7 +29,6 @@ html, body {
 
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
 
     padding: 16px;
     padding-bottom: env(safe-area-inset-bottom);
@@ -39,11 +37,38 @@ html, body {
 /* ===== HEADER ===== */
 .header {
     text-align: center;
+    margin-bottom: 10px;
 }
 
 .header h2 {
-    margin: 5px 0 10px;
+    margin: 5px 0;
     font-size: 22px;
+}
+
+/* ===== COUNT TOP ===== */
+.count {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.count-box {
+    flex: 1;
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 12px 0;
+    text-align: center;
+}
+
+.count-box .label {
+    font-size: 16px;
+}
+
+.count-box .num {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 4px;
 }
 
 /* ===== INPUT ===== */
@@ -78,18 +103,7 @@ input {
 .btn-blue { background: #2196F3; }
 .btn-gray { background: #607D8B; }
 
-/* ===== COUNT ===== */
-.count {
-    margin-top: 15px;
-    padding: 12px;
-    background: #f5f5f5;
-    border-radius: 10px;
-    font-size: 20px;
-    display: flex;
-    justify-content: space-around;
-}
-
-/* ===== DESKTOP LIMIT ===== */
+/* ===== DESKTOP ===== */
 @media (min-width: 600px) {
     .app {
         border-radius: 14px;
@@ -104,38 +118,45 @@ input {
 
 <div class="app">
 
-    <div>
-        <div class="header">
-            <h2>🚗 ระบบลานจอดรถ</h2>
+    <div class="header">
+        <h2>🚗 ระบบลานจอดรถ</h2>
+    </div>
+
+    <!-- COUNT TOP -->
+    <div class="count">
+        <div class="count-box">
+            <div class="label">🚗 CAR</div>
+            <div class="num" id="car">0</div>
         </div>
-
-        <input id="plate" placeholder="กรอกเลขทะเบียน">
-
-        <div class="buttons">
-            <button class="btn btn-in" onclick="confirmAction('IN')">รถเข้า</button>
-            <button class="btn btn-out" onclick="confirmAction('OUT')">รถออก</button>
-
-            <button class="btn btn-blue" onclick="confirmAction('FREE')">ออกฟรี</button>
-            <button class="btn btn-blue" onclick="confirmAction('MONTHLY')">รายเดือน</button>
-
-            <button class="btn btn-gray" onclick="confirmAction('LOST')">บัตรหาย</button>
-            <button class="btn btn-gray" onclick="confirmAction('CANCEL')">ยกเลิก</button>
+        <div class="count-box">
+            <div class="label">🏍 MOTOR</div>
+            <div class="num" id="motor">0</div>
         </div>
     </div>
 
-    <div class="count">
-        <div>🚗 CAR: <b id="car">0</b></div>
-        <div>🏍 MOTOR: <b id="motor">0</b></div>
+    <!-- INPUT -->
+    <input id="plate" placeholder="กรอกเลขทะเบียน">
+
+    <!-- BUTTONS -->
+    <div class="buttons">
+        <button class="btn btn-in" onclick="confirmAction('IN')">รถเข้า</button>
+        <button class="btn btn-out" onclick="confirmAction('OUT')">รถออก</button>
+
+        <button class="btn btn-blue" onclick="confirmAction('FREE')">ออกฟรี</button>
+        <button class="btn btn-blue" onclick="confirmAction('MONTHLY')">รายเดือน</button>
+
+        <button class="btn btn-gray" onclick="confirmAction('LOST')">บัตรหาย</button>
+        <button class="btn btn-gray" onclick="confirmAction('CANCEL')">ยกเลิก</button>
     </div>
 
 </div>
 
 <script>
-/* ===== CONFIG ===== */
+/* ================= CONFIG ================= */
 const CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vQozjlYJ6hV33GT9TG4eUu3VelfF8Z3etL5-Rnsr1BbaCx2c673jMr_RdR57fD_nFANnraiJMy4SN6n/pub?gid=0&single=true&output=csv";
 
-/* ===== LOAD COUNT ===== */
+/* ================= LOAD COUNT ================= */
 async function loadCount() {
     try {
         const res = await fetch(CSV_URL);
@@ -168,7 +189,7 @@ async function loadCount() {
     }
 }
 
-/* ===== BUTTON ===== */
+/* ================= BUTTON ================= */
 function confirmAction(func) {
     const plate = document.getElementById("plate").value.trim();
     if (!plate) {
@@ -181,7 +202,7 @@ function confirmAction(func) {
     document.getElementById("plate").value = "";
 }
 
-/* ===== START ===== */
+/* ================= START ================= */
 document.addEventListener("DOMContentLoaded", () => {
     loadCount();
     setInterval(loadCount, 15000);
