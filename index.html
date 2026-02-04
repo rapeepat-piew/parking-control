@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Parking Control</title>
+
+    <style>
+        body {
+            font-family: Tahoma;
+            background: #f2f2f2;
+        }
+
+        .container {
+            width: 420px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 100%;
+            font-size: 22px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+        }
+
+        .btn-in { background: #4CAF50; color: white; }
+        .btn-out { background: #F44336; color: white; }
+        .btn-other { background: #2196F3; color: white; }
+
+        .count {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>🚗 ระบบลานจอดรถ</h2>
+
+    <input id="plate" placeholder="กรอกเลขทะเบียน">
+
+    <button class="btn btn-in" onclick="confirmAction('IN')">รถเข้า</button>
+    <button class="btn btn-out" onclick="confirmAction('OUT')">รถออก</button>
+    <button class="btn btn-other" onclick="confirmAction('FREE')">ออกฟรี</button>
+    <button class="btn btn-other" onclick="confirmAction('MONTHLY')">รายเดือน</button>
+    <button class="btn btn-other" onclick="confirmAction('LOST')">บัตรหาย</button>
+    <button class="btn btn-other" onclick="confirmAction('CANCEL')">ยกเลิก</button>
+    <button class="btn btn-other" onclick="confirmAction('TEST')">ทดสอบพิมพ์</button>
+
+    <div class="count">
+        🚗 CAR : <b id="car">0</b> |
+        🏍 MOTOR : <b id="motor">0</b>
+    </div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const CSV_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vQozjlYJ6hV33GT9TG4eUu3VelfF8Z3etL5-Rnsr1BbaCx2c673jMr_RdR57fD_nFANnraiJMy4SN6n/pub?gid=0&single=true&output=csv";
+
+/* ================= LOAD COUNT ================= */
+async function loadCount() {
+    try {
+        const res = await fetch(CSV_URL);
+        const text = await res.text();
+
+        const rows = text.trim().split("\n");
+        rows.shift(); // ลบ header
+
+        let car = 0;
+        let motor = 0;
+
+        rows.forEach(row => {
+            const col = row.split(",");
+
+            const vehicleType = col[2]?.trim().toUpperCase(); // C
+            const status = col[6]?.trim().toUpperCase();      // G
+
+            // นับเฉพาะสถานะ IN
+            if (status === "IN") {
+                if (vehicleType === "CAR") car++;
+                if (vehicleType === "MOTOR") motor++;
+            }
+        });
+
+        document.getElementById("car").innerText = car;
+        document.getElementById("motor").innerText = motor;
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById("car").innerText = 0;
+        document.getElementById("motor").innerText = 0;
+    }
+}
+
+/* ================= BUTTON ================= */
+function confirmAction(func) {
+    const plate = document.getElementById("plate").value.trim();
+    if (!plate) {
+        alert("กรุณากรอกเลขทะเบียน");
+        return;
+    }
+    if (!confirm(`ทะเบียน: ${plate}\nฟังก์ชัน: ${func}`)) return;
+
+    console.log("SEND:", plate, func);
+    document.getElementById("plate").value = "";
+}
+
+/* ================= START ================= */
+document.addEventListener("DOMContentLoaded", () => {
+    loadCount();
+    setInterval(loadCount, 15000); // refresh ทุก 15 วิ
+});
+</script>
+
+</body>
+</html>
