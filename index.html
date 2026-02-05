@@ -154,7 +154,7 @@ input {
 <script>
 /* ================= CONFIG ================= */
 const CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vQozjlYJ6hV33GT9TG4eUu3VelfF8Z3etL5-Rnsr1BbaCx2c673jMr_RdR57fD_nFANnraiJMy4SN6n/pub?gid=0&single=true&output=csv";
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vRHuP2Upab3Mbtvf-n_YIN0ewZFNhfdJ5XPWENVQsAASDIQZTKd9If-InpI30FbvJvKwib_WJ-2Zfhd/pub?gid=0&single=true&output=csv";
 
 /* ================= LOAD COUNT ================= */
 async function loadCount() {
@@ -171,7 +171,7 @@ async function loadCount() {
         rows.forEach(row => {
             const col = row.split(",");
             const vehicleType = col[2]?.trim().toUpperCase(); // C
-            const status = col[6]?.trim().toUpperCase();      // G
+            const status = col[12]?.trim().toUpperCase();      // G
 
             if (status === "IN") {
                 if (vehicleType === "CAR") car++;
